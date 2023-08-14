@@ -271,6 +271,12 @@ loader.load('model/3rd_person_model.glb', function (gltf) {
   gltf.scene.scale.set(newScaleFactor, newScaleFactor, newScaleFactor);
   model = gltf.scene;
 
+
+
+
+
+
+  /////mot
   // Set the initial position of the model to match the body position
   model.position.copy(body.position);
   model.rotateY(110)
