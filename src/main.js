@@ -263,39 +263,47 @@ scene.background = new THREE.CubeTextureLoader()
         'sky/nz.jpg'
 	] );
   const loader = new GLTFLoader();
+// Inside the loader.load callback
+let model
+// Inside the loader.load callback
+loader.load('model/3rd_person_model.glb', function (gltf) {
+  const newScaleFactor = 0.02;
+  gltf.scene.scale.set(newScaleFactor, newScaleFactor, newScaleFactor);
+  model = gltf.scene;
 
-  loader.load('human/scene.gltf', function (gltf) {
-      // This function is called when the GLTF model is loaded
-  
-      // Traverse through the loaded model's meshes and assign textures
-      gltf.scene.traverse(function (node) {
-          if (node.isMesh) {
-              // Load the texture
-              const textureLoader = new THREE.TextureLoader();
-              textureLoader.load('human/textures/Zombie_baseColor.jpg', function (texture) {
-                  // Create a material with the loaded texture
-                  const material = new THREE.MeshStandardMaterial({
-                      map: texture // Assign the texture to the 'map' property
-                      // You can also set other material properties like 'roughness', 'metalness', etc. here
-                  });
-  
-                  // Assign the material to the mesh
-                  node.material = material;
-              });
-          }
-      });
-  
-      // Add the modified model to the scene
-      scene.add(gltf.scene);
-  }, undefined, function (error) {
-      console.error(error);
-  });
-  
+  // Set the initial position of the model to match the body position
+  model.position.copy(body.position);
+  model.rotateY(110)
+  scene.add(model);
+}, undefined, function (error) {
+  console.error(error);
+});
+
+let model2
+loader.load( 'model/parachute.glb', function ( gltf ) {
+
+	const newScaleFactor = 0.5;
+  gltf.scene.scale.set(newScaleFactor, newScaleFactor, newScaleFactor);
+  model2 = gltf.scene;
+  model2.position.copy(body.position )
+  model2.position.y -= 1.5;
+  model2.visible = false;
+  scene.add(model2);
+}, undefined, function ( error ) {
+
+	console.error( error );
+
+} );
+
+  var light = new THREE.AmbientLight(0xffffff);
+scene.add(light);
+
 // Add event listener to the document
 document.addEventListener('keydown', function(event) {
   // Check if the pressed key is the spacebar (keyCode 32)
-  if (event.key === 'a' || event.key === 'A') {
+  if (event.key === 'a' || event.key === 'A' || event.key=== 'ش' ) {
     parachutist.surfaceArea=3.14*parachutist.dim*parachutist.dim 
+    model2.visible = true;
   }
 });
 // GUI
@@ -306,7 +314,7 @@ const bodyGeometry = new THREE.BoxGeometry(1, 1, 1);
 const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 bodyMaterial.roughness = 0.4;
 const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-scene.add(body);
+//scene.add(body);
 body.position.y = pos;
 gui.add(body.position,'y',0,4000,0.1)
 //Ground
@@ -363,21 +371,18 @@ function updateMotion(deltaTime) {
 // let dd=new Vector(thrustForceX,thrustForceY,thrustForceZ)
   // حساب التسارع
   let Fg = parachutist.fg; // القوة الجاذبية
-  // let Fd = Math.sqrt(Math.pow(thrustForceX, 2) + Math.pow(thrustForceY, 2) + Math.pow(thrustForceZ, 2)); 
-  // console.log (Fd)
-//   let Fd = Math.abs(thrustForceY);
-// console.log(Fd);
 
      let Fd =parachutist.fd(initialVelocity)
     
   // قوة المقاومة
   acceleration = parachutist.calculateAcceleration(Fg, Fd);
-
+  
   // حساب السرعة والارتفاع
-  let velocity = initialVelocity + acceleration * 0.01;
+  let velocity = initialVelocity + acceleration * 0.017;
     console.log ("v=",velocity)
-  let height =    initialHeight - velocity*0.02
- 
+    console.log ("mm=",model.position)
+  let height =    initialHeight - velocity*0.017
+
   // تحديث الحركة الحالية
   initialHeight = height;
   initialVelocity = velocity;
@@ -390,28 +395,25 @@ const animate = () => {
   deltaTime +=0.01
   if( (pos > 1 )){
   updateMotion(deltaTime);
-  body.position.y=pos}
-
+  body.position.y=pos
+  model.position.copy(body.position);
+  model2.position.copy(body.position);
+  model2.position.y -= 1.5;}
   else {
     initialVelocity = 0;
     fd = 0
     initialHeight =0
     acceleration=0
+    model.position.y=0
+    model2.visible=false
   }
-   
-//  forceDrag = 0.5 * p.density* velocity * velocity * 1.2* p.surfaceArea;
   
-     // console.log('fc = ', velocity)
-    // console.log(pos)
-   // Update camera position
+
   camera.position.y = body.position.y + 10; // Adjust the camera's position as per your requirement
 
   // Look at the body
   camera.lookAt(body.position);
 controls.target.copy(body.position);
-
-
-
 
 heightNumberElement.innerText = `Height: ${initialHeight.toFixed(2)}`; // Update the height number with the current body position
 velocityNumberElement.innerText = `Velocity: ${initialVelocity.toFixed(2)}`;

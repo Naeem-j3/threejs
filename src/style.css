@@ -20,7 +20,7 @@ body{
  
   #velocityNumber{ 
  position: absolute; 
- top: 30px; 
+ top: 35px; 
  left: 10px; 
  color: white; 
  font-family: Arial, sans-serif; 
@@ -28,7 +28,7 @@ body{
   } 
   #dragForceNumber{ 
  position: absolute; 
- top: 50px; 
+ top: 55px; 
  left: 10px; 
  color: white; 
  font-family: Arial, sans-serif; 
@@ -36,7 +36,7 @@ body{
   }
   #accelerationNumber{ 
     position: absolute; 
-    top: 70px; 
+    top: 75px; 
     left: 10px; 
     color: white; 
     font-family: Arial, sans-serif; 
